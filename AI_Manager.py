@@ -14,21 +14,21 @@ def extract_json(text):
 client = Groq(api_key="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")
 
 
-def generate_mindmap(notes: list[str]) -> dict:
+def generate_mindmap(notes) -> dict:
     if not notes:
         return {}
 
-    formatted_notes = "\n".join(f"- {note}" for note in notes)
+    formatted_notes = repr(notes)
 
     prompt = f"""
 You are a mind mapping assistant.
 
 Given a list of notes or ideas, return a JSON object representing a structured mind map. 
-Group related items under categories or themes. If multiple levels of grouping are needed, use nested dictionaries.
+for each item in the input place make a profile where you: place a short sumery under "sumery":, a long description under "description": and connections in a list with only the titles of the notes under "connections":
 
 Return only valid JSON — no explanation, no preamble.
 
-Input:
+Input in json format:
 {formatted_notes}
     """
 

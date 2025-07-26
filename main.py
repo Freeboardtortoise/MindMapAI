@@ -16,8 +16,10 @@ class App(ctk.CTk):
         super().__init__()
         self.title("MindMapAI")
         self.geometry("800x600")
-        self.notes = ['my first note']
+        self.notes = {'my first note':"this is the context of your first note"}
         self.mindmap = {}
+        self.mapFrame = ctk.CTkFrame(self)
+        self.mapFrame.pack(side="right", padx=10, pady=10, fill="both", expand=True)
         self.create_top_bar()
         self.create_notes_frame()
 
@@ -38,6 +40,7 @@ class App(ctk.CTk):
         self.notesFrame.pack(side="left", padx=10, pady=10, fill="both", expand=True)
         self.all_notes_frame = ctk.CTkFrame(self.notesFrame)
         self.all_notes_frame.pack(side="left", padx=10, pady=10, fill="y", expand=True)
+
         self.create_all_notes_frame()
         self.create_new_notes_frame()
     
@@ -46,16 +49,35 @@ class App(ctk.CTk):
         self.new_notes_frame.pack(side="right", padx=10, pady=10, fill="both", expand=True)
         # self.new_notes_frame.grid(row=0, column=1, padx=10, pady=10, sticky="nsew")
 
-        self.noteInput = ctk.CTkTextbox(self.notesFrame, height=10, width=500)
+        self.title = ctk.CTkEntry(self.new_notes_frame, placeholder_text="Title")
+        self.title.pack(side="top", padx=10, pady=10, fill="x")
+
+        self.noteInput = ctk.CTkTextbox(self.new_notes_frame, height=10, width=500)
         self.noteInput.pack(padx=10, pady=10, fill="both", expand=True)
 
-        self.addButton = ctk.CTkButton(self.notesFrame, text="Add Note", command=self.on_add_note)
+        self.addButton = ctk.CTkButton(self.new_notes_frame, text="Save", command=self.on_add_note)
         self.addButton.pack(side="left", padx=10, pady=10)
+
+        self.deleteButton = ctk.CTkButton(self.new_notes_frame, text="Delete", command=self.on_delete_note)
+        self.deleteButton.pack(side="right", padx=10, pady=10)
 
     def create_all_notes_frame(self):
         for note in self.notes:
-            note_button = ctk.CTkButton(self.all_notes_frame, text=note)
+            note_button = ctk.CTkButton(self.all_notes_frame, text=note, command=lambda: self.open_note(note))
             note_button.pack(side="top", padx=10, pady=10, fill="x")
+    
+    def open_note(self, note):
+        self.noteInput.delete("1.0", "end")
+        self.noteInput.insert("1.0", self.notes[note])
+        self.title.delete(0, "end")
+        self.title.insert(0, note)
+    
+    def on_delete_note(self):
+        note = self.title.get()
+        if note in self.notes:
+            del self.notes[note]
+            self.update_notes_frame()
+
     
     def update_notes_frame(self):
         clear_frame(self.all_notes_frame)
@@ -65,7 +87,7 @@ class App(ctk.CTk):
     def on_add_note(self):
         note = self.noteInput.get("1.0", "end").strip()
         if note:
-            self.notes.append(note)
+            self.notes.setdefault(self.title.get(), note)
             self.noteInput.delete("1.0", "end")
             print(self.notes)
         self.update_notes_frame()
@@ -77,6 +99,8 @@ class App(ctk.CTk):
             print(self.mindmap)
         else:
             self.status_label.configure(text="Please enter some notes!")
+    
+
 
 if __name__ == "__main__":
     ctk.set_appearance_mode("dark")
