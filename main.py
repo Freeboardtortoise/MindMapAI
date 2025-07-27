@@ -1,5 +1,6 @@
 import customtkinter as ctk
 import tkinter as tk
+import json
 # API key "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"
 
 import AI_Manager as aim
@@ -24,6 +25,18 @@ class App(ctk.CTk):
         self.create_top_bar()
         self.create_notes_frame()
         self.make_canvas()
+        self.initialise_keyboard_shortcuts()
+    
+    def initialise_keyboard_shortcuts(self):
+        self.bind_all("<Control-s>", self.on_save)
+        # self.bind_all("<Control-z>", self.undo)
+        # self.bind_all("<Control-y>", self.redo)
+        # self.bind_all("<Control-f>", self.focus_search_bar)
+        self.bind_all("<Control-Return>", self.on_add_note)
+        self.bind_all("<Control-BackSpace>", self.on_delete_note)
+
+        self.noteInput.bind("<Control-Return>", self.on_add_note)
+        self.noteInput.bind("<Control-BackSpace>", self.on_delete_note)
 
     def create_top_bar(self):
         self.top_bar = ctk.CTkFrame(self, height=50)
@@ -39,10 +52,27 @@ class App(ctk.CTk):
 
         self.saveButton = ctk.CTkButton(self.top_bar, text="Save", command=self.on_save)
         self.saveButton.pack(side="right", padx=10)
-    
+
+        self.loadButton = ctk.CTkButton(self.top_bar, text="Load", command=self.on_load)
+        self.loadButton.pack(side="right", padx=10)
+
+        self.projectName = ctk.CTkEntry(self.top_bar, placeholder_text="Project Name")
+        self.projectName.pack(side="right", padx=10, pady=10)
+
     def on_save(self):
-        with open("notes.json", "w") as f:
+        with open(self.projectName.get() + ".json", "w") as f:
             json.dump(self.notes, f)
+
+    def on_load(self):
+        try:
+            with open(self.projectName.get() + ".json", "r") as f:
+                self.notes = json.load(f)
+                self.change_graph()
+                self.update_notes_frame()
+        except FileNotFoundError:
+            pass
+    
+
     
     def create_notes_frame(self):
         self.notesFrame = ctk.CTkFrame(self)
@@ -110,19 +140,23 @@ class App(ctk.CTk):
             self.mindmap = aim.generate_mindmap(self.notes)
             # print(self.mindmap)
         else:
-            self.status_label.configure(text="Please enter some notes!")
+            pass
         self.change_graph()
     
     def make_canvas(self):
         self.map_canvas = tk.Canvas(self.mapFrame, width=800, height=600, bg="#1e1e2e")
-        self.map_canvas.pack(fill="both", expand=True)
-        self.map_canvas.create_oval(50, 50, 90, 90, fill="#89b4fa", outline="")
-        self.map_canvas.create_text(70, 70, text="Note A", fill="#cdd6f4")
+        self.map_canvas.pack(fill="both", expand=True, padx=10, pady=10, side="right", anchor="n", ipady=10, ipadx=10)
     
     def change_graph(self):
         self.map_canvas.delete("all")
+        self.map_canvas.update()
+        width = self.map_canvas.winfo_width()
+        height = self.map_canvas.winfo_height()
+
+        print(f"width: {width}, height {height}")
+
         # adding the lines
-        node_stuff = aim.generate_node_stuff(self.mindmap)
+        node_stuff = aim.generate_node_stuff(self.mindmap, width, height)
         for node in self.mindmap:
             for connection in self.mindmap[node]["connections"]:
                 x1, x2 = node_stuff[connection]["x"] + int(node_stuff[connection]["width"] / 2), node_stuff[node]["x"] + int(node_stuff[node]["width"] / 2)

@@ -25,7 +25,7 @@ You are a mind mapping assistant.
 
 Given a list of notes or ideas, return a JSON object representing a structured mind map. 
 for each item in the input place make a profile where you: place a short sumery under "sumery":, a long description under "description": and connections in a list with only the titles of the notes under "connections":
-
+DO NOT ADD ANY EXTA ONES please
 
 example:
 
@@ -92,16 +92,21 @@ def ask_question(prompt):
         print("❌ Error contacting Groq or parsing response:", e)
         return {}
 
-def generate_node_stuff(mindmap):
+def generate_node_stuff(mindmap, width, height):
     answere = ask_question(""" you will be given a json input and I would like you to make me an order of the nodes in the map and x and y cords and sizes regarding the percieved importance or the node
-                           I would like you to order them so that if you where to draw a straight line between any of them they would not cross the blocks you create
+                           i would like them reliivly spaces out
                            your input is in the for of json
                            
                            Return only valid JSON — no explanation, no preamble.
+                           DO NOT ADD ANY EXTRA ONES
                            here is an example of what I would like you to give me:
                            
                            {"note name": {"x": 10, "y": 1000, "width": 40, "height": 40}, {"other note name": {"x": 10, "y": 10, "width": 50, "height": 50}}}
-                           
+                           width and height are in pixels:
+                           width: """ + str(width) + """
+                           height: """ + str(height) + """
+
+                           I would like it to look natural
                            Input in json format:
                            """ + repr(mindmap))
     
