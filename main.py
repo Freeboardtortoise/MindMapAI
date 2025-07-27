@@ -26,17 +26,15 @@ class App(ctk.CTk):
         self.create_notes_frame()
         self.make_canvas()
         self.initialise_keyboard_shortcuts()
-    
-    def initialise_keyboard_shortcuts(self):
-        self.bind_all("<Control-s>", self.on_save)
-        # self.bind_all("<Control-z>", self.undo)
-        # self.bind_all("<Control-y>", self.redo)
-        # self.bind_all("<Control-f>", self.focus_search_bar)
-        self.bind_all("<Control-Return>", self.on_add_note)
-        self.bind_all("<Control-BackSpace>", self.on_delete_note)
+        self.theme = "dark"
+        self.load_theme()
 
-        self.noteInput.bind("<Control-Return>", self.on_add_note)
-        self.noteInput.bind("<Control-BackSpace>", self.on_delete_note)
+    def load_theme(self):
+        theme_path = f"themes/{self.theme}.json"
+        with open(theme_path, 'r') as f:
+            data = json.load(f)
+        ctk.set_appearance_mode(data["mode"])
+        ctk.set_default_color_theme(data["color_theme"])
 
     def create_top_bar(self):
         self.top_bar = ctk.CTkFrame(self, height=50)
@@ -59,6 +57,23 @@ class App(ctk.CTk):
         self.projectName = ctk.CTkEntry(self.top_bar, placeholder_text="Project Name")
         self.projectName.pack(side="right", padx=10, pady=10)
 
+        self.theme_button = ctk.CTkOptionMenu(self.top_bar, values=["dark", "light"], command=self.change_theme)
+        self.theme_button.pack(side="right", padx=10)
+
+    def change_theme(self, theme_name):
+        self.theme = theme_name
+        self.load_theme()
+    
+    def initialise_keyboard_shortcuts(self):
+        self.bind_all("<Control-s>", self.on_save)
+        # self.bind_all("<Control-z>", self.undo)
+        # self.bind_all("<Control-y>", self.redo)
+        # self.bind_all("<Control-f>", self.focus_search_bar)
+        self.bind_all("<Control-Return>", self.on_add_note)
+        self.bind_all("<Control-BackSpace>", self.on_delete_note)
+
+        self.noteInput.bind("<Control-Return>", self.on_add_note)
+        self.noteInput.bind("<Control-BackSpace>", self.on_delete_note)
     def on_save(self):
         with open(self.projectName.get() + ".json", "w") as f:
             json.dump(self.notes, f)
