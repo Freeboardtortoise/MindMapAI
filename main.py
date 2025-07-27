@@ -1,4 +1,5 @@
 import customtkinter as ctk
+import tkinter as tk
 # API key "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"
 
 import AI_Manager as aim
@@ -22,6 +23,7 @@ class App(ctk.CTk):
         self.mapFrame.pack(side="right", padx=10, pady=10, fill="both", expand=True)
         self.create_top_bar()
         self.create_notes_frame()
+        self.make_canvas()
 
     def create_top_bar(self):
         self.top_bar = ctk.CTkFrame(self, height=50)
@@ -34,6 +36,13 @@ class App(ctk.CTk):
 
         self.generate_button = ctk.CTkButton(self.top_bar, text="Generate", command=self.on_generate)
         self.generate_button.pack(side="right", padx=10)
+
+        self.saveButton = ctk.CTkButton(self.top_bar, text="Save", command=self.on_save)
+        self.saveButton.pack(side="right", padx=10)
+    
+    def on_save(self):
+        with open("notes.json", "w") as f:
+            json.dump(self.notes, f)
     
     def create_notes_frame(self):
         self.notesFrame = ctk.CTkFrame(self)
@@ -60,15 +69,19 @@ class App(ctk.CTk):
 
         self.deleteButton = ctk.CTkButton(self.new_notes_frame, text="Delete", command=self.on_delete_note)
         self.deleteButton.pack(side="right", padx=10, pady=10)
-
     def create_all_notes_frame(self):
+        self.noteButtons = []
         for note in self.notes:
-            note_button = ctk.CTkButton(self.all_notes_frame, text=note, command=lambda: self.open_note(note))
+            note_button = ctk.CTkButton(self.all_notes_frame, text=note, command=lambda note=note: self.open_note(note))
             note_button.pack(side="top", padx=10, pady=10, fill="x")
+
+            self.noteButtons.append(note_button)
     
     def open_note(self, note):
+        print(note)
         self.noteInput.delete("1.0", "end")
         self.noteInput.insert("1.0", self.notes[note])
+
         self.title.delete(0, "end")
         self.title.insert(0, note)
     
@@ -89,18 +102,38 @@ class App(ctk.CTk):
         if note:
             self.notes.setdefault(self.title.get(), note)
             self.noteInput.delete("1.0", "end")
-            print(self.notes)
         self.update_notes_frame()
 
     def on_generate(self):
         if self.notes:
             # Here you’d call your mind map generator function
             self.mindmap = aim.generate_mindmap(self.notes)
-            print(self.mindmap)
+            # print(self.mindmap)
         else:
             self.status_label.configure(text="Please enter some notes!")
+        self.change_graph()
     
+    def make_canvas(self):
+        self.map_canvas = tk.Canvas(self.mapFrame, width=800, height=600, bg="#1e1e2e")
+        self.map_canvas.pack(fill="both", expand=True)
+        self.map_canvas.create_oval(50, 50, 90, 90, fill="#89b4fa", outline="")
+        self.map_canvas.create_text(70, 70, text="Note A", fill="#cdd6f4")
+    
+    def change_graph(self):
+        self.map_canvas.delete("all")
+        # adding the lines
+        node_stuff = aim.generate_node_stuff(self.mindmap)
+        for node in self.mindmap:
+            for connection in self.mindmap[node]["connections"]:
+                x1, x2 = node_stuff[connection]["x"] + int(node_stuff[connection]["width"] / 2), node_stuff[node]["x"] + int(node_stuff[node]["width"] / 2)
+                y1, y2 = node_stuff[connection]["y"] + int(node_stuff[connection]["height"] / 2), node_stuff[node]["y"] + int(node_stuff[node]["height"] / 2)
+                line = self.map_canvas.create_line(x1, y1, x2, y2, fill="#89b4fa", width=2, tags="line")
+        #adding nodes
+        for node in node_stuff:
+            self.map_canvas.create_rectangle(node_stuff[node]["x"], node_stuff[node]["y"], node_stuff[node]["x"]+ node_stuff[node]["width"], node_stuff[node]["height"] + node_stuff[node]["y"], fill="#89b4fa")
+            self.map_canvas.create_text(node_stuff[node]["x"] + int(node_stuff[node]["width"] / 2), node_stuff[node]["y"] + int(node_stuff[node]["height"] / 2), text=node, fill="#cdd6f4")
 
+            
 
 if __name__ == "__main__":
     ctk.set_appearance_mode("dark")
