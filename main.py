@@ -28,6 +28,7 @@ class App(ctk.CTk):
         self.initialise_keyboard_shortcuts()
         self.theme = "dark"
         self.load_theme()
+        self.currentNote = "my first note"
 
     def load_theme(self):
         theme_path = f"themes/{self.theme}.json"
@@ -72,11 +73,15 @@ class App(ctk.CTk):
         self.bind_all("<Control-Return>", self.on_add_note)
         self.bind_all("<Control-BackSpace>", self.on_delete_note)
 
+        # self.bind_all("<Control-tab>", self.next_note)
+
         self.noteInput.bind("<Control-Return>", self.on_add_note)
         self.noteInput.bind("<Control-BackSpace>", self.on_delete_note)
-    def on_save(self):
+    
+    def on_save(self, event=None):
         with open(self.projectName.get() + ".json", "w") as f:
             json.dump(self.notes, f)
+    
 
     def on_load(self):
         try:
@@ -124,13 +129,14 @@ class App(ctk.CTk):
     
     def open_note(self, note):
         print(note)
+        self.currentNote = note
         self.noteInput.delete("1.0", "end")
         self.noteInput.insert("1.0", self.notes[note])
 
         self.title.delete(0, "end")
         self.title.insert(0, note)
     
-    def on_delete_note(self):
+    def on_delete_note(self, event=None):
         note = self.title.get()
         if note in self.notes:
             del self.notes[note]
@@ -142,7 +148,7 @@ class App(ctk.CTk):
         self.create_all_notes_frame()
 
 
-    def on_add_note(self):
+    def on_add_note(self, event=None):
         note = self.noteInput.get("1.0", "end").strip()
         if note:
             self.notes.setdefault(self.title.get(), note)
