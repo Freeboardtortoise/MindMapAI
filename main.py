@@ -1,6 +1,7 @@
 import customtkinter as ctk
 import tkinter as tk
 import json
+import copy
 # API key "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"
 
 import AI_Manager as aim
@@ -29,6 +30,9 @@ class App(ctk.CTk):
         self.theme = "dark"
         self.load_theme()
         self.currentNote = 0
+        self.undo_stack = []
+        self.undo_stack_pointer = 0
+        self.undo_stack_limit = 10
 
     def load_theme(self):
         theme_path = f"themes/{self.theme}.json"
@@ -67,17 +71,44 @@ class App(ctk.CTk):
     
     def initialise_keyboard_shortcuts(self):
         self.bind_all("<Control-s>", self.on_save)
-        # self.bind_all("<Control-z>", self.undo)
-        # self.bind_all("<Control-y>", self.redo)
-        # self.bind_all("<Control-f>", self.focus_search_bar)
+
+        # note stuff (adding notes and removing notes)
         self.bind_all("<Control-Return>", self.on_add_note)
         self.bind_all("<Control-BackSpace>", self.on_delete_note)
 
+        # navigation
         self.bind_all("<Control-period>", self.next_note)
         self.bind_all("<Control-comma>", self.prev_note)
 
         self.noteInput.bind("<Control-Return>", self.on_add_note)
         self.noteInput.bind("<Control-BackSpace>", self.on_delete_note)
+
+        # generating notes
+        self.bind_all("<Control-E>", self.on_generate)
+
+        # undo and redo
+        self.bind_all("<Control-z>", self.undo)
+        self.bind_all("<Control-Shift-z>", self.redo)
+    
+
+    def undo(self, event=None):
+        print("undo_stack ", self.undo_stack)
+        print("undo_stack_pointer ", str(self.undo_stack_pointer))
+        self.undo_stack_pointer -= 1
+        if self.undo_stack_pointer >= 0:
+            self.notes = self.undo_stack[self.undo_stack_pointer]
+            self.change_graph()
+            self.update_notes_frame()
+        else:
+            self.undo_stack_pointer = 0
+    
+    def redo(self, event=None):
+        self.undo_stack_pointer += 1
+        if self.undo_stack_pointer < len(self.undo_stack):
+            self.notes = self.undo_stack[self.undo_stack_pointer]
+            self.update_notes_frame()
+        else:
+            self.undo_stack_pointer = len(self.undo_stack)
     
     def next_note(self, event=None):
         self.currentNote += 1
@@ -167,6 +198,10 @@ class App(ctk.CTk):
             self.title.delete(0, "end")
             self.title.focus_set()
         self.update_notes_frame()
+        self.undo_stack.append(copy.deepcopy(self.notes))
+        self.undo_stack_pointer += 1
+        if len(self.undo_stack) > self.undo_stack_limit:
+            self.undo_stack.pop(0)
 
     def on_generate(self):
         if self.notes:
