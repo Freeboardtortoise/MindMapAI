@@ -28,7 +28,7 @@ class App(ctk.CTk):
         self.initialise_keyboard_shortcuts()
         self.theme = "dark"
         self.load_theme()
-        self.currentNote = "my first note"
+        self.currentNote = 0
 
     def load_theme(self):
         theme_path = f"themes/{self.theme}.json"
@@ -73,10 +73,21 @@ class App(ctk.CTk):
         self.bind_all("<Control-Return>", self.on_add_note)
         self.bind_all("<Control-BackSpace>", self.on_delete_note)
 
-        # self.bind_all("<Control-tab>", self.next_note)
+        self.bind_all("<Control-period>", self.next_note)
+        self.bind_all("<Control-comma>", self.prev_note)
 
         self.noteInput.bind("<Control-Return>", self.on_add_note)
         self.noteInput.bind("<Control-BackSpace>", self.on_delete_note)
+    
+    def next_note(self, event=None):
+        self.currentNote += 1
+        self.currentNote %= (len(self.notes))
+        self.open_note(list(self.notes.keys())[self.currentNote])
+    
+    def prev_note(self, event=None):
+        self.currentNote -= 1
+        self.currentNote %= (len(self.notes))
+        self.open_note(list(self.notes.keys())[self.currentNote])
     
     def on_save(self, event=None):
         with open(self.projectName.get() + ".json", "w") as f:
@@ -122,14 +133,13 @@ class App(ctk.CTk):
     def create_all_notes_frame(self):
         self.noteButtons = []
         for note in self.notes:
-            note_button = ctk.CTkButton(self.all_notes_frame, text=note, command=lambda note=note: self.open_note(note))
+            note_button = ctk.CTkButton(self.all_notes_frame, text=note, command=lambda note=note: self.open_note(note), height=10)
             note_button.pack(side="top", padx=10, pady=10, fill="x")
 
             self.noteButtons.append(note_button)
     
     def open_note(self, note):
         print(note)
-        self.currentNote = note
         self.noteInput.delete("1.0", "end")
         self.noteInput.insert("1.0", self.notes[note])
 
@@ -153,6 +163,9 @@ class App(ctk.CTk):
         if note:
             self.notes.setdefault(self.title.get(), note)
             self.noteInput.delete("1.0", "end")
+
+            self.title.delete(0, "end")
+            self.title.focus_set()
         self.update_notes_frame()
 
     def on_generate(self):
