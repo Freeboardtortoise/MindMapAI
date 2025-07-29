@@ -24,26 +24,34 @@ def generate_mindmap(notes) -> dict:
 You are a mind mapping assistant.
 
 Given a list of notes or ideas, return a JSON object representing a structured mind map. 
-for each item in the input place make a profile where you: place a short sumery under "sumery":, a long description under "description": and connections in a list with only the titles of the notes under "connections":
-DO NOT ADD ANY EXTA ONES please
+I would like you to come up with ideas based on the notes and the content in the JSON input.
+I would not like you to use the notes directly in the output. but rather ideas related to the notes for example:
+for an input of notes about neurons use nodes about things in the notes content that will be relevant to neurons.
+place a short sumery under "sumery": the color of the connection 'in hex code' and connections in a list with only the titles of the ideas under "connections":
+add as many as you deem nececery
 
 example:
 
 {
-    "note1": {
+    "idea1": {
         "sumery": "short sumery",
-        "description": "long description",
-        "connections": ["note2", "note3"]
+        "connections": ["note2", "note3"],
+        "color": "#ff0000"
     },
-    "note2": {
+    "idea2": {
         "sumery": "short sumery",
-        "description": "long description",
-        "connections": ["note1", "note3"]
+        "connections": ["note1", "note3"],
+        "color": "#ff0011"
     },
-    "note3": {
+    "concept2": {
         "sumery": "short sumery",
-        "description": "long description",
-        "connections": ["note1", "note2"]
+        "connections": ["note1", "note3"],
+        "color": "#ff0044"
+    },
+    "idea3": {
+        "sumery": "short sumery",
+        "connections": ["note1", "note2"],
+        "color": "#f405600"
     }
 }
 

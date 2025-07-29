@@ -18,7 +18,7 @@ class App(ctk.CTk):
     def __init__(self):
         super().__init__()
         self.title("MindMapAI")
-        self.geometry("800x600")
+        self.geometry("1500x600")
         self.notes = {'my first note':"this is the context of your first note"}
         self.mindmap = {}
         self.mapFrame = ctk.CTkFrame(self)
@@ -43,7 +43,7 @@ class App(ctk.CTk):
 
     def create_top_bar(self):
         self.top_bar = ctk.CTkFrame(self, height=50)
-        self.top_bar.pack(side="top", fill="x", padx=10, pady=10)
+        self.top_bar.pack(side="top", fill="x", padx=10, pady=10, expand=False)
         self.grid_rowconfigure(0, weight=0)
         self.grid_columnconfigure(0, weight=1)
 
@@ -207,6 +207,7 @@ class App(ctk.CTk):
         if self.notes:
             # Here you’d call your mind map generator function
             self.mindmap = aim.generate_mindmap(self.notes)
+            print(self.mindmap)
             # print(self.mindmap)
         else:
             pass
@@ -230,7 +231,7 @@ class App(ctk.CTk):
             for connection in self.mindmap[node]["connections"]:
                 x1, x2 = node_stuff[connection]["x"] + int(node_stuff[connection]["width"] / 2), node_stuff[node]["x"] + int(node_stuff[node]["width"] / 2)
                 y1, y2 = node_stuff[connection]["y"] + int(node_stuff[connection]["height"] / 2), node_stuff[node]["y"] + int(node_stuff[node]["height"] / 2)
-                line = self.map_canvas.create_line(x1, y1, x2, y2, fill="#89b4fa", width=2, tags="line")
+                line = self.map_canvas.create_line(x1, y1, x2, y2, fill=self.mindmap[node]["color"], width=2, tags="line")
         #adding nodes
         for node in node_stuff:
             self.map_canvas.create_rectangle(node_stuff[node]["x"], node_stuff[node]["y"], node_stuff[node]["x"]+ node_stuff[node]["width"], node_stuff[node]["height"] + node_stuff[node]["y"], fill="#89b4fa")
