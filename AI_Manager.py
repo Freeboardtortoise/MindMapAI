@@ -24,38 +24,69 @@ def generate_mindmap(notes) -> dict:
 You are a mind mapping assistant.
 
 Given a list of notes or ideas, return a JSON object representing a structured mind map. 
-I would like you to come up with ideas based on the notes and the content in the JSON input.
-I would not like you to use the notes directly in the output. but rather ideas related to the notes for example:
-for an input of notes about neurons use nodes about things in the notes content that will be relevant to neurons.
-place a short sumery under "sumery": the color of the connection 'in hex code' and connections in a list with only the titles of the ideas under "connections":
-add as many as you deem nececery
+I would like you do the following for each note:
+- come up with ideas based on the notes and the contents of the notes in the JSON input
+- come up with an importance factor for each idea
+- give me ideal x and y coordenates for each node so that if plotted... looks natural and doesn't overlap and is relitivly spaced out
+- give me ideal width and hight for each node
+- give me a list of titles to other ideas that are potentialy related to the current note
+- give me a hex code for the color of the note and the color of the text to make sure it stands out the apropriat amount
+ 
+add as many as you deem nececery to transfur the meening across clearly
+
+please don't use the direct titles of the notes but rather topics/titles that coresspond to the ideas that you come up with
+
+please make sure the text is easely identafyable on the block of "color"
+
+make sure the connections are the same name as the nodes name
 
 example:
 
 {
     "idea1": {
-        "sumery": "short sumery",
         "connections": ["note2", "note3"],
-        "color": "#ff0000"
+        "color": "#ff0000",
+        "text-color":"#55ff55",
+        "importance": 1,
+        "x":100,
+        "y":20,
+        "width":100,
+        "hight":45
     },
     "idea2": {
-        "sumery": "short sumery",
         "connections": ["note1", "note3"],
-        "color": "#ff0011"
+        "color": "#ff0011",
+        "text-color":"#55fee44",
+        "importance": 0.45,
+        "x":320,
+        "y":134,
+        "width":87,
+        "hight":84
     },
     "concept2": {
-        "sumery": "short sumery",
         "connections": ["note1", "note3"],
-        "color": "#ff0044"
+        "color": "#ff0044",
+        "text-color":"#f056006"
+        "importance": 0.65,
+        "x":34,
+        "y":67,
+        "width":455,
+        "hight":98
     },
     "idea3": {
-        "sumery": "short sumery",
         "connections": ["note1", "note2"],
-        "color": "#f405600"
+        "color": "#f405600",
+        "text-color" "#f56650",
+        "importance": 0.94,
+        "x":56,
+        "y":26,
+        "width":67
+        "height"678
     }
 }
 
 Return only valid JSON — no explanation, no preamble.
+please make sure the connections and names are constant and don't differ from other nodes connections
 
 
 Input in json format:
@@ -101,7 +132,7 @@ def ask_question(prompt):
         return {}
 
 def generate_node_stuff(mindmap, width, height):
-    answere = ask_question(""" you will be given a json input and I would like you to make me an order of the nodes in the map and x and y cords and sizes regarding the percieved importance or the node
+    answere = ask_question(""" you will be given a json input and I would like you to make me an order of the nodes in the map and x and y cords and sizes regarding the percieved importance or the node as well as colors for the importtance of the node witch will be provided in the input
                            i would like them reliivly spaces out
                            your input is in the for of json
                            
@@ -109,8 +140,8 @@ def generate_node_stuff(mindmap, width, height):
                            DO NOT ADD ANY EXTRA ONES
                            here is an example of what I would like you to give me:
                            
-                           {"note name": {"x": 10, "y": 1000, "width": 40, "height": 40}, {"other note name": {"x": 10, "y": 10, "width": 50, "height": 50}}}
-                           width and height are in pixels:
+                           {"note name": {"x": 10, "y": 1000, "width": 40, "height": 40, "color": "#ff0000"}, {"other note name": {"x": 10, "y": 10, "width": 50, "height": 50, "color": "#00ff00"}}}
+                           width and height are in pixels (please make sure all of the nodes look natural and stay within the screen): and order
                            width: """ + str(width) + """
                            height: """ + str(height) + """
 

@@ -1,6 +1,4 @@
-#!/bin/sh
-'''exec' "/home/darion/Code/hackathon_projects/copy_paste manager/.venv/bin/python3" "$0" "$@"
-' '''
+#!/home/darion/Code/hackathon_projects/MindMapAI/.venv/bin/python
 # -*- coding: utf-8 -*-
 import re
 import sys

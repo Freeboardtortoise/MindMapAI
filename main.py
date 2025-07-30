@@ -223,19 +223,21 @@ class App(ctk.CTk):
         width = self.map_canvas.winfo_width()
         height = self.map_canvas.winfo_height()
 
-        print(f"width: {width}, height {height}")
+        print(f"self.mindmap: {self.mindmap}")
+
 
         # adding the lines
-        node_stuff = aim.generate_node_stuff(self.mindmap, width, height)
+
         for node in self.mindmap:
             for connection in self.mindmap[node]["connections"]:
-                x1, x2 = node_stuff[connection]["x"] + int(node_stuff[connection]["width"] / 2), node_stuff[node]["x"] + int(node_stuff[node]["width"] / 2)
-                y1, y2 = node_stuff[connection]["y"] + int(node_stuff[connection]["height"] / 2), node_stuff[node]["y"] + int(node_stuff[node]["height"] / 2)
-                line = self.map_canvas.create_line(x1, y1, x2, y2, fill=self.mindmap[node]["color"], width=2, tags="line")
+                if connection in self.mindmap:
+                    x1, x2 = self.mindmap[connection]["x"] + int(self.mindmap[connection]["width"] / 2), self.mindmap[node]["x"] + int(self.mindmap[node]["width"] / 2)
+                    y1, y2 = self.mindmap[connection]["y"] + int(self.mindmap[connection]["height"] / 2), self.mindmap[node]["y"] + int(self.mindmap[node]["height"] / 2)
+                    line = self.map_canvas.create_line(x1, y1, x2, y2, fill=self.mindmap[node]["color"], width=2, tags="line")
         #adding nodes
-        for node in node_stuff:
-            self.map_canvas.create_rectangle(node_stuff[node]["x"], node_stuff[node]["y"], node_stuff[node]["x"]+ node_stuff[node]["width"], node_stuff[node]["height"] + node_stuff[node]["y"], fill="#89b4fa")
-            self.map_canvas.create_text(node_stuff[node]["x"] + int(node_stuff[node]["width"] / 2), node_stuff[node]["y"] + int(node_stuff[node]["height"] / 2), text=node, fill="#cdd6f4")
+        for node in self.mindmap:
+            self.map_canvas.create_rectangle(self.mindmap[node]["x"], self.mindmap[node]["y"], self.mindmap[node]["x"]+ self.mindmap[node]["width"], self.mindmap[node]["height"] + self.mindmap[node]["y"],fill=self.mindmap[node]["color"])
+            self.map_canvas.create_text(self.mindmap[node]["x"] + int(self.mindmap[node]["width"] / 2), self.mindmap[node]["y"] + int(self.mindmap[node]["height"] / 2), text=node, fill=self.mindmap[node]["text-color"])
 
             
 
