@@ -206,7 +206,7 @@ class App(ctk.CTk):
     def on_generate(self):
         if self.notes:
             # Here you’d call your mind map generator function
-            self.mindmap = aim.generate_mindmap(self.notes)
+            self.mindmap = aim.generate_mindmap(self.notes, 12, (self.map_canvas.winfo_width(), self.winfo_height()))
             print(self.mindmap)
             # print(self.mindmap)
         else:
@@ -237,7 +237,7 @@ class App(ctk.CTk):
         #adding nodes
         for node in self.mindmap:
             self.map_canvas.create_rectangle(self.mindmap[node]["x"], self.mindmap[node]["y"], self.mindmap[node]["x"]+ self.mindmap[node]["width"], self.mindmap[node]["height"] + self.mindmap[node]["y"],fill=self.mindmap[node]["color"])
-            self.map_canvas.create_text(self.mindmap[node]["x"] + int(self.mindmap[node]["width"] / 2), self.mindmap[node]["y"] + int(self.mindmap[node]["height"] / 2), text=node, fill=self.mindmap[node]["text-color"])
+            self.map_canvas.create_text(self.mindmap[node]["x"] + int(self.mindmap[node]["width"] / 2), self.mindmap[node]["y"] + int(self.mindmap[node]["height"] / 2), text=node, fill=self.mindmap[node]["text-color"], font=("Arial", 12))
 
             
 

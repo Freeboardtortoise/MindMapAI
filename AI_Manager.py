@@ -14,9 +14,11 @@ def extract_json(text):
 client = Groq(api_key="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")
 
 
-def generate_mindmap(notes) -> dict:
+def generate_mindmap(notes, fontSize, canvas_size) -> dict:
     if not notes:
         return {}
+    xSize = canvas_size[0]
+    ySize = canvas_size[1]
 
     formatted_notes = repr(notes)
 
@@ -27,16 +29,16 @@ Given a list of notes or ideas, return a JSON object representing a structured m
 I would like you do the following for each note:
 - come up with ideas based on the notes and the contents of the notes in the JSON input
 - come up with an importance factor for each idea
-- give me ideal x and y coordenates for each node so that if plotted... looks natural and doesn't overlap and is relitivly spaced out
-- give me ideal width and hight for each node
-- give me a list of titles to other ideas that are potentialy related to the current note
-- give me a hex code for the color of the note and the color of the text to make sure it stands out the apropriat amount
+- give me ideal x and y coordinates for each node so that when plotted on the screen the boxes do not overlap and are well spaced out
+- give me an ideal width and height for each node based on a font size of """ + str(fontSize) + """ Arial so that the text doesn't get cut off (be generous in your estimation so that the width of the text doesn't overlap the container)
+- give me a list of titles to other ideas that are potentially related to the current note
+- give me a hex code for the color of the note and the color of the text to make sure there is contrast so that it is readable
  
-add as many as you deem nececery to transfur the meening across clearly
+add as many as you deem neccesary to transfer the meaning clearly
 
-please don't use the direct titles of the notes but rather topics/titles that coresspond to the ideas that you come up with
+please don't use the direct titles of the notes but rather topics/titles that correspond to the ideas that you come up with
 
-please make sure the text is easely identafyable on the block of "color"
+please make sure the text is easily readable on the block of "color"
 
 make sure the connections are the same name as the nodes name
 
@@ -51,7 +53,7 @@ example:
         "x":100,
         "y":20,
         "width":100,
-        "hight":45
+        "height":45
     },
     "idea2": {
         "connections": ["note1", "note3"],
@@ -61,7 +63,7 @@ example:
         "x":320,
         "y":134,
         "width":87,
-        "hight":84
+        "height":84
     },
     "concept2": {
         "connections": ["note1", "note3"],
@@ -71,7 +73,7 @@ example:
         "x":34,
         "y":67,
         "width":455,
-        "hight":98
+        "height":98
     },
     "idea3": {
         "connections": ["note1", "note2"],
@@ -81,7 +83,7 @@ example:
         "x":56,
         "y":26,
         "width":67
-        "height"678
+        "height":678
     }
 }
 
@@ -132,7 +134,7 @@ def ask_question(prompt):
         return {}
 
 def generate_node_stuff(mindmap, width, height):
-    answere = ask_question(""" you will be given a json input and I would like you to make me an order of the nodes in the map and x and y cords and sizes regarding the percieved importance or the node as well as colors for the importtance of the node witch will be provided in the input
+    answere = ask_question(""" you will be given a json input and I would like you to make me an order of the nodes in the map and x and y cords and sizes regarding the perceived importance or the node as well as colors for the importtance of the node witch will be provided in the input
                            i would like them reliivly spaces out
                            your input is in the for of json
                            
